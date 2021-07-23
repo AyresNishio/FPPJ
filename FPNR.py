@@ -14,8 +14,5 @@ import pandas as pd
 
 line, z, nbus, nlin = lerdados('NetData14Bus.xlsx','LoadData14Bus.xlsx')
 
-print("hahaha")
-print(line)
-print(z)
 # if __name__ == "FPNR":
 #     FPNR()
