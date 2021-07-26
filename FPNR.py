@@ -12,7 +12,10 @@ import pandas as pd
 # def FPNR():
 #     #Leitura de dados da rede e das cargas (subrotina ler_dados)
 
-line, z, nbus, nlin = lerdados('NetData14Bus.xlsx','LoadData14Bus.xlsx')
+Lines, Z, nbus, nlin = lerdados('NetData14Bus.xlsx','LoadData14Bus.xlsx')
+
+
+solver(Lines, Z, nbus, nlin)
 
 # if __name__ == "FPNR":
 #     FPNR()

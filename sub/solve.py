@@ -1,7 +1,7 @@
 import numpy as np
 import cmath 
 
-def solver(Lines, z, nbus, nlin):
+def solver(Lines, Z, nbus, nlin):
     # Determinacao do estado (Metodo de Newton Raphson)
     # Inicializacoes
     vang = []
@@ -14,9 +14,9 @@ def solver(Lines, z, nbus, nlin):
 
     array =  np.arange(nbus*nbus).reshape(nbus,nbus)
     Ybarra = np.zeros_like(array,np.complex64)
-    
+    #
     # Montagem da matriz Ybarra
-    for line in Lines.iterrows():
+    for index, line in Lines.iterrows():
         zs=complex(line['R'],line['X']);
         y= 1/zs
         bsh=complex(0,line['Bsh'])/2;
@@ -27,3 +27,18 @@ def solver(Lines, z, nbus, nlin):
         Ybarra[para][para]=Ybarra[para][para]+y+bsh       # elemento diagonal (j,j)
         Ybarra[de][para]= - y/tap                         # elemento fora da diagonal (i,j)
         Ybarra[para][de]= - y/tap                       # elemento fora da diagonal (j,i)
+
+    G = Ybarra.real
+    B = Ybarra.imag
+
+    for i in range(1,nbus):
+        B[i][i]=B[i][i] + Z['V'][i] 
+
+    vmag[0:nbus-1] = 1
+    vang[0:nbus-1] = 0
+
+    for i in range(0,nbus-1):
+        if(Z['tipo'][i] > 0):
+            vmag[i]=Z['V'][i];
+        else:
+            vmag[i]=1;
