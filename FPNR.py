@@ -1,6 +1,3 @@
-from sub.deltaz import *
-from sub.flowres import *
-from sub.jacob import *
 from sub.ler_dados import *
 from sub.output import *
 from sub.solve import *
