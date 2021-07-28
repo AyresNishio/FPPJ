@@ -36,7 +36,7 @@ def solver(Lines, Z, nbus, nlin):
     G = Ybarra.real
     B = Ybarra.imag
 
-    for i in range(1,nbus):
+    for i in range(nbus):
         B[i][i]=B[i][i] + Z['V'][i] 
 
     # Inicializacao do estado (flat start)
@@ -69,7 +69,7 @@ def solver(Lines, Z, nbus, nlin):
         deltax = np.linalg.inv(J)*res.transpose()
 
         # Solucao do problema linear para determinar a modificacao a ser realizada no estado atual 
-        for i in range(0, neq-1):
+        for i in range(neq):
             if(i <= np):
                 vang[zloc[i]]=vang[zloc[i]]+deltax[i] # atualizacao do angulo da tensao
             else:
