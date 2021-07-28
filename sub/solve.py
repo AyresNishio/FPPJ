@@ -1,7 +1,7 @@
 
-from sub.deltaz import *
-from sub.flowres import *
-from sub.jacob import *
+from deltaz import *
+from flowres import *
+from jacob import *
 
 import numpy as np
 import cmath 
@@ -17,8 +17,8 @@ def solver(Lines, Z, nbus, nlin):
     indconv = 0 # indicador de convergencia (assume valor 1 quando o processo iterativo converge)
     iter=0;
 
-    array =  np.arange(nbus*nbus).reshape(nbus,nbus)
-    Ybarra = np.zeros_like(array,np.complex64)
+    Ybarra = np.zeros((nbus, nbus), np.complex64)
+    
     #
     # Montagem da matriz Ybarra
     for index, line in Lines.iterrows():
@@ -53,7 +53,7 @@ def solver(Lines, Z, nbus, nlin):
     while(iter <= maxiter and indconv !=1):
         
         # Calculo dos residuos - mismatches deltaP e deltaQ (subrotina deltaz)
-        zest, res, zloc, np, nq, neq = deltaz(vmag, vang, z, G, B, nbus)
+        zest, res, zloc, np, nq, neq = deltaz(vmag, vang, Z, G, B, nbus)
 
         # Verificacao da convergencia
         absres=abs(res);
@@ -69,7 +69,7 @@ def solver(Lines, Z, nbus, nlin):
         deltax = np.linalg.inv(J)*res.transpose()
 
         # Solucao do problema linear para determinar a modificacao a ser realizada no estado atual 
-        for i in range( 0, neq-1):
+        for i in range(0, neq-1):
             if(i <= np):
                 vang[zloc[i]]=vang[zloc[i]]+deltax[i] # atualizacao do angulo da tensao
             else:
