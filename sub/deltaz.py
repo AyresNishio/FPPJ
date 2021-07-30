@@ -24,6 +24,7 @@ def deltaz (vmag, vang, Z, G, B, nbus):
         if Z.at[i,'Tipo'] == 0: # Barras PQ
             nP=nP+1
             nQ=nQ+1
+            nQ=nQ+1
 
             # injecao de potencia ativa
             for j in range(nbus):
