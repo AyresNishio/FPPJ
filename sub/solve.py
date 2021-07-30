@@ -1,13 +1,14 @@
 
-from deltaz import *
-from flowres import *
-from jacob import *
+from sub.deltaz import *
+from sub.flowres import *
+from sub.jacob import *
 import numpy as np
 import cmath 
 
 def solver(Lines, Z, nbus, nlin):
     # Determinacao do estado (Metodo de Newton Raphson)
     # Inicializacoes
+    global np
     vang = []
     vmag = []
     zest = []
@@ -36,15 +37,15 @@ def solver(Lines, Z, nbus, nlin):
     B = Ybarra.imag
 
     for i in range(nbus):
-        B[i][i]=B[i][i] + Z['V'][i] 
+        B[i,i]=B[i,i] + Z['V'][i+1] 
 
     # Inicializacao do estado (flat start)
-    vmag[0:nbus-1] = 1
-    vang[0:nbus-1] = 0
+    vmag = nbus*[1]
+    vang = nbus*[0]
 
-    for i in range(0,nbus-1):
-        if(Z['tipo'][i] > 0):
-            vmag[i]=Z['V'][i]
+    for i in range(nbus):
+        if(Z['Tipo'][i+1] > 0):
+            vmag[i]=Z['V'][i+1]
         else:
             vmag[i]=1
 
@@ -52,24 +53,24 @@ def solver(Lines, Z, nbus, nlin):
     while(iter <= maxiter and indconv !=1):
         
         # Calculo dos residuos - mismatches deltaP e deltaQ (subrotina deltaz)
-        zest, res, zloc, np, nq, neq = deltaz(vmag, vang, Z, G, B, nbus)
+        zest, res, zloc, nP, nq, neq = delta_z(vmag, vang, Z, G, B, nbus)
 
         # Verificacao da convergencia
-        absres=abs(res);
-        maxres=max(res);  # maior mismatch observado
+        absres=abs(res)
+        maxres=max(res)  # maior mismatch observado
         
         if(maxres <= tol):
             indconv=1
         
         # Formacao da matriz Jacobiano (subrotina jacob)
-        J = jacob(vmag, vang, G, B, Z, zloc, nbus, np, nq, neq)
+        J = jacob(vmag, vang, G, B, Z, zloc, nbus, nP, nq, neq)
 
         # Atualizacao do estado 
         deltax = np.linalg.inv(J)*res.transpose()
 
         # Solucao do problema linear para determinar a modificacao a ser realizada no estado atual 
         for i in range(neq):
-            if(i <= np):
+            if(i <= nP):
                 vang[zloc[i]]=vang[zloc[i]]+deltax[i] # atualizacao do angulo da tensao
             else:
                 vmag[zloc[i]]=vmag[zloc[i]]+deltax[i] # atualizacao da magnitude da tensao

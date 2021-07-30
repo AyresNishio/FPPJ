@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-def deltaz (vmag, vang, Z, G, B, nbus):
+def delta_z(vmag, vang, Z, G, B, nbus):
 
     zest=np.zeros(nbus)
     zestp=np.zeros(nbus)
@@ -22,7 +22,7 @@ def deltaz (vmag, vang, Z, G, B, nbus):
     # Calculo das injecoes de potencia e dos residuos deltaP e deltaQ
     for i in range(nbus):
 
-        if Z.at[i,'Tipo'] == 0: # Barras PQ
+        if Z['Tipo'][i+1] == 0: # Barras PQ
             nP=nP+1
             nQ=nQ+1
 
@@ -31,7 +31,7 @@ def deltaz (vmag, vang, Z, G, B, nbus):
                 zestp[nP]=zestp[nP]+vmag[j]*(G[i,j]*math.cos(vang[i]-vang[j])+B[i,j]*math.sin(vang[i]-vang[j]))
             
             zestp[nP]=vmag[i]*zestp[nP]
-            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
+            resp[nP]=(Z['Pg'][i+1]-Z['Pl'][i+1])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
             zlocp[nP]=i
 
             # injecao de potencia reativa
@@ -40,10 +40,10 @@ def deltaz (vmag, vang, Z, G, B, nbus):
             
             zestq[nQ]=vmag[i]*zestq[nQ]
             #resq[nQ]=(-Z.at[i,'Ql'])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
-            resq[nQ]=(-Z['Ql'][i])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
+            resq[nQ]=(-Z['Ql'][i+1])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
             zlocq[nQ]=i
         
-        elif Z.at[i,'Tipo'] == 1: # Barras PV
+        elif Z['Tipo'][i+1] == 1: # Barras PV
             nP=nP+1
 
             # injecao de potencia ativa
@@ -52,7 +52,7 @@ def deltaz (vmag, vang, Z, G, B, nbus):
             
             zestp[nP]=vmag[i]*zestp[nP]
             #resp[nP]=(Z.at[i,'Pg']-Z.at[i,'Pl'])-zestp[nP]
-            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP]
+            resp[nP]=(Z['Pg'][i+1]-Z['Pl'][i+1])-zestp[nP]
             zlocp[nP]=i
 
     nEQ=nP+nQ
