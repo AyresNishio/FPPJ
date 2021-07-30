@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 def deltaz (vmag, vang, Z, G, B, nbus):
 
@@ -30,7 +31,7 @@ def deltaz (vmag, vang, Z, G, B, nbus):
                 zestp[nP]=zestp[nP]+vmag[j]*(G[i,j]*math.cos(vang[i]-vang[j])+B[i,j]*math.sin(vang[i]-vang[j]))
             
             zestp[nP]=vmag[i]*zestp[nP]
-            resp[nP]=(Z.at[i,'Pg']-Z.at[i,'Pl'])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
+            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
             zlocp[nP]=i
 
             # injecao de potencia reativa
@@ -38,7 +39,8 @@ def deltaz (vmag, vang, Z, G, B, nbus):
                 zestq[nQ]=zestq[nQ]+vmag[j]*(G[i,j]*math.sin(vang[i]-vang[j])-B[i,j]*math.cos(vang[i]-vang[j]))
             
             zestq[nQ]=vmag[i]*zestq[nQ]
-            resq[nQ]=(-Z.at[i,'Ql'])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
+            #resq[nQ]=(-Z.at[i,'Ql'])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
+            resq[nQ]=(-Z['Ql'][i])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
             zlocq[nQ]=i
         
         elif Z.at[i,'Tipo'] == 1: # Barras PV
@@ -49,7 +51,8 @@ def deltaz (vmag, vang, Z, G, B, nbus):
                 zestp[nP]=zestp[nP]+vmag[j]*(G[i,j]*math.cos(vang[i]-vang[j])+B[i,j]*math.sin(vang[i]-vang[j]))
             
             zestp[nP]=vmag[i]*zestp[nP]
-            resp[nP]=(Z.at[i,'Pg']-Z.at[i,'Pl'])-zestp[nP]
+            #resp[nP]=(Z.at[i,'Pg']-Z.at[i,'Pl'])-zestp[nP]
+            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP]
             zlocp[nP]=i
 
     nEQ=nP+nQ
