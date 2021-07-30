@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 def flowres(vmag, vang, Ybus, G, B, Z, line, nbus, nlin):
 
