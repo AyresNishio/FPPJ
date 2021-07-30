@@ -17,4 +17,4 @@ solver(Lines, Z, nbus, nlin)
 # if __name__ == "FPNR":
 #     FPNR()
 print("andreiteste")
-print("andreiteste2")
+print("andreiteste2 qualquer coisa")
