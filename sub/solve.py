@@ -3,12 +3,11 @@ from sub.deltaz import *
 from sub.flowres import *
 from sub.jacob import *
 import numpy as np
-import cmath 
 
 def solver(Lines, Z, nbus, nlin):
     # Determinacao do estado (Metodo de Newton Raphson)
     # Inicializacoes
-    global np
+
     vang = []
     vmag = []
     zest = []
@@ -37,7 +36,7 @@ def solver(Lines, Z, nbus, nlin):
     B = Ybarra.imag
 
     for i in range(nbus):
-        B[i,i]=B[i,i] + Z['V'][i+1] 
+        B[i,i]=B[i,i] + Z['CS'][i+1] 
 
     # Inicializacao do estado (flat start)
     vmag = nbus*[1]
