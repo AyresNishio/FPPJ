@@ -1,5 +1,6 @@
 from sub.ler_dados import *
 from sub.output import *
+from sub.deltaz import *
 from sub.solve import *
 import pandas as pd
 
@@ -16,5 +17,3 @@ solver(Lines, Z, nbus, nlin)
 
 # if __name__ == "FPNR":
 #     FPNR()
-print("andreiteste")
-print("andreiteste2 qualquer coisa")
