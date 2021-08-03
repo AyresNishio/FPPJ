@@ -8,8 +8,6 @@ def solver(Lines, Z, nbus, nlin):
     # Determinacao do estado (Metodo de Newton Raphson)
     # Inicializacoes
 
-    vang = []
-    vmag = []
     zest = []
     tol = 0.0001 # tolerancia para convergencia (a ser confrontada com os mismatches deltaP e deltaQ)
     maxiter = 10 # numero maximo de iteracoes
@@ -39,8 +37,11 @@ def solver(Lines, Z, nbus, nlin):
         B[i,i]=B[i,i] + Z['CS'][i+1] 
 
     # Inicializacao do estado (flat start)
-    vmag = nbus*[1]
-    vang = nbus*[0]
+    # vmag = nbus*[1]
+    # vang = nbus*[0]
+
+    vmag = np.ones(nbus)
+    vang = np.zeros(nbus)
 
     for i in range(nbus):
         if(Z['Tipo'][i+1] > 0):
@@ -65,17 +66,20 @@ def solver(Lines, Z, nbus, nlin):
         J = jacob(vmag, vang, G, B, Z, zloc, nbus, nP, nq, neq)
 
         # Atualizacao do estado 
-        deltax = np.linalg.inv(J)*res.transpose()
+        deltax = np.dot(np.linalg.inv(J),res.transpose())
 
         # Solucao do problema linear para determinar a modificacao a ser realizada no estado atual 
         for i in range(neq):
+            izloc = int(zloc[i])
             if(i <= nP):
-                vang[zloc[i]]=vang[zloc[i]]+deltax[i] # atualizacao do angulo da tensao
+                vang[izloc]=vang[izloc]+deltax[i] # atualizacao do angulo da tensao
             else:
-                vmag[zloc[i]]=vmag[zloc[i]]+deltax[i] # atualizacao da magnitude da tensao
+                vmag[izloc]=vmag[izloc]+deltax[i] # atualizacao da magnitude da tensao
             iter=iter+1; #incrementa contador de iteracoes
 
         vang*(180/3.1416)
 
         # Calculo dos fluxos/injecoes de potencia e corrente para o estado convergido (subrotina flowres)
-        FPA, FPA1, FPR, FPR1, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, line, nbus, nlin)
+        FPA, FPA1, FPR, FPR1, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, Lines, nbus, nlin)
+
+        print("_|_")

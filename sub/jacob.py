@@ -4,7 +4,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
 
     J = np.zeros((neq,2*nbus))
     J1 = np.zeros((neq,neq)) #True Jacobian
-    ivar= 0
+    ivar = -1
     # Montagem matriz Jacobiano (expressoes livro Abur)
     # Varre equacao por equacao e verifica em quais colunas serao geradas derivadas (em funcao da barra ser PQ ou PV)  
     # Para cada equacao sao calculadas duas derivadas (para barras PQ) ou uma derivada (para barras PV)  
@@ -69,5 +69,21 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
                     J[i,j] = J[i,j]-(vmag[j]**2)*G[j,j]
                 else:
                     J[i,j] = vmag[iloc]*vmag[j]*(-G[iloc,j]*np.cos(vang[iloc]-vang[j])-B[iloc,j]*np.sin(vang[iloc]-vang[j])) # derivada dQi/dtetaj (fora diag - Mij)
+
+    
+    for j in range(2*nbus):
+
+        if (j <= nbus - 1):
+            j1 = j
+            if (z["Tipo"][j1 + 1] == 1):
+                ivar = ivar + 1
+                J1[:, ivar] = J[:, j]
+        else:
+            j1=j-nbus
+        if (z["Tipo"][j1 + 1] == 0):
+            ivar = ivar + 1
+            J1[:, ivar] = J[:, j]
+
+    J = J1
 
     return J

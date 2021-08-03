@@ -15,5 +15,7 @@ Lines, Z, nbus, nlin = lerdados('NetData14Bus.xlsx','LoadData14Bus.xlsx')
 
 solver(Lines, Z, nbus, nlin)
 
+print("Yo")
+
 # if __name__ == "FPNR":
 #     FPNR()

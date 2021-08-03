@@ -23,7 +23,6 @@ def delta_z(vmag, vang, Z, G, B, nbus):
         if Z['Tipo'][i+1] == 0: # Barras PQ
             nP=nP+1
             nQ=nQ+1
-            nQ=nQ+1
 
             # injecao de potencia ativa
             for j in range(nbus):
@@ -56,7 +55,7 @@ def delta_z(vmag, vang, Z, G, B, nbus):
 
     nEQ=(nP+1)+(nQ+1)
     zest=np.concatenate((zestp,zestq),axis=0) # numero total de equacoes (deltaP e deltaQ)
-    res=np.concatenate((resp,resq),axis=0) # res - vetor que agrega os subvetores resp e resq
+    res=np.concatenate((resp[0:nP+1],resq[0:nQ+1]),axis=0) # res - vetor que agrega os subvetores resp e resq
     zloc=np.concatenate((zlocp[0:nP+1],zlocq[0:nQ+1]),axis=0)
 
 
