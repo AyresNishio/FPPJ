@@ -81,5 +81,3 @@ def solver(Lines, Z, nbus, nlin):
 
         # Calculo dos fluxos/injecoes de potencia e corrente para o estado convergido (subrotina flowres)
         FPA, FPA1, FPR, FPR1, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, Lines, nbus, nlin)
-
-        print("_|_")
