@@ -2,17 +2,17 @@ import numpy as np
 
 def delta_z(vmag, vang, Z, G, B, nbus):
 
-    zest=np.zeros(nbus)
-    zestp=np.zeros(nbus)
-    zestq=np.zeros(nbus)
+    zest=np.zeros(nbus, np.float64)
+    zestp=np.zeros(nbus, np.float64)
+    zestq=np.zeros(nbus, np.float64)
 
-    zloc=np.zeros(nbus)
-    zlocp=np.zeros(nbus-1)
-    zlocq=np.zeros(nbus)
+    zloc=np.zeros(nbus, np.float64)
+    zlocp=np.zeros(nbus, np.float64)
+    zlocq=np.zeros(nbus, np.float64)
     
-    res=np.zeros(nbus)
-    resp=np.zeros(nbus)
-    resq=np.zeros(nbus)
+    res=np.zeros(nbus, np.float64)
+    resp=np.zeros(nbus, np.float64)
+    resq=np.zeros(nbus, np.float64)
     
     nP=-1
     nQ=-1
