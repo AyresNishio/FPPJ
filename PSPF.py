@@ -140,7 +140,7 @@ def delta_z(vmag, vang, Z, G, B, nbus):
             
             zestq[nQ]=vmag[i]*zestq[nQ]
             #resq[nQ]=(-Z.at[i,'Ql'])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
-            resq[nQ]=(-Z['Ql'][i])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
+            resq[nQ]=(Z['Qg'][i]-Z['Ql'][i])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
             zlocq[nQ]=i
         
         elif Z['Tipo'][i] == 1: # Barras PV
@@ -194,15 +194,15 @@ def flowres(vmag, vang, Ybus, G, B, Z, line, nbus, nlin):
 
     # Calculo dos fluxos de potencia ativa e reativa nos ramos
     for index, row in line.iterrows():
-        i = index - 1
+        i = index
         From=int(row['De']-1)
         To=int(row['Para']-1)
         zs=complex(row['R'], row['X'])
         ys=pow(zs,-1)
         gs=ys.real
         bs=ys.imag
-        if row['C'] > 0:
-            bsh=(1/row['C'])/2
+        if row['B'] > 0:
+            bsh=(row['B'])/2
         else:
             bsh=0
         FPA[i]=pow(vmag[From],2)*gs-vmag[From]*vmag[To]*(gs*np.cos(vang[From]-vang[To])+bs*np.sin(vang[From]-vang[To]))
@@ -237,8 +237,8 @@ def run_power_flow(dadoslinha, dadoscarga):
     for index, line in Lines.iterrows():
         zs=complex(line['R'],line['X']);
         y= 1/zs
-        if line['C'] > 0:
-            bsh=complex(0,1/line['C'])/2;
+        if line['B'] > 0:
+            bsh=complex(0,line['B'])/2;
         else:
             bsh=0
         de = int(line['De'])-1
@@ -253,7 +253,7 @@ def run_power_flow(dadoslinha, dadoscarga):
     B = Ybarra.imag
 
     for i in range(nbus):
-        B[i,i]=B[i,i] + Z['CS'][i] 
+        B[i,i]=B[i,i] + Z['Bsh'][i] 
 
     # Inicializacao do estado (flat start)
     # vmag = nbus*[1]
@@ -296,7 +296,7 @@ def run_power_flow(dadoslinha, dadoscarga):
                 vmag[izloc]=vmag[izloc]+deltax[i] # atualizacao da magnitude da tensao
         iter=iter+1; #incrementa contador de iteracoes
 
-    vang*(180/np.pi)
+    
     # Calculo dos fluxos/injecoes de potencia e corrente para o estado convergido (subrotina flowres)
     FPA_dp, FPA_pd, FPR_dp, FPR_pd, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, Lines, nbus, nlin)
     # Lines, Z, nbus, nlin = lerdados(network_file,load_file)
@@ -306,28 +306,41 @@ def run_power_flow(dadoslinha, dadoscarga):
     De = list(range(1,nbus+1)) + list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1))
     Para = ['-']*len(Vmag) + ['-']*len(Vang) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) 
     Valor = Vmag.tolist() + Vang.tolist() + FPA_dp.tolist() + FPA_pd.tolist() + FPR_dp.tolist() + FPR_pd.tolist() + IPA.tolist() + IPR.tolist()
-
-# Desvios baseados em:
+    Vang = vang*(180/np.pi)
+    # Desvios baseados em:
                     # IEEE TRANS. INSTRUMENTATION AND MEASUREMENT
                     # , VOL. 66, NO. 8, pp. 2036-2045, AUG. 2017,
                     #  “A Cubature Kalman Filter Based Power System Dynamic State Estimator”,
                     #  A. Sharma, S. C. Srivastava, and S. Chakrabarti
-    desvio_padrao = []
-    for i in tipo:
-        if i == 'V':
-            desvio_padrao.append(0.006)
-        if i == 'P': 
-            desvio_padrao.append(0.01)
-        if i == 'Q': 
-            desvio_padrao.append(0.01)
-        if i == 'Ang':
-            desvio_padrao.append(0.018)
+   
+    #Montagem do DataFrame       
+    resultados_fluxo = {'Iterações':iter,'Erro máximo':maxres, 'Tolerancia':tol}
+    dados_barra = {'Bus':list(range(1,nbus+1)),'V':Vmag.tolist(),'Angle (deg)': Vang.tolist(),'Pinj (pu)':IPA.tolist(), 'Qinj (pu)': IPR.tolist(), 'Ireal (pu)': Ibarra.real.tolist(), 'I_imag (pu)': Ibarra.imag.tolist()}
+    dados_linha = {'Branch':list(range(1,nlin+1)),'From':list(Lines['De']),'To':list(Lines['Para']),'Pij':FPA_dp.tolist(),'Qij':FPR_dp.tolist(),'Pji':FPA_pd.tolist(),'Qji':FPR_pd.tolist(),'Ire_ij': FC.real.tolist(),'Iim_ij': FC.imag.tolist(),'Ire_ji':FC1.real.tolist(),'Iim_ji':FC1.imag.tolist()}
+    
+    
+    resultados_barra = pd.DataFrame(dados_barra)
+    resultados_linha = pd.DataFrame(dados_linha)
+    
+    return resultados_barra, resultados_linha,resultados_fluxo
 
-    #Montagem do DataFrame        
-    valores = {'Tipo':tipo,'De':De,'Para': Para,'Valor': Valor,'Desvio Padrão':desvio_padrao}
-    flow_result = pd.DataFrame(valores)
+####################################################################Main######################################################
+resultados_barras,resultados_linhas,dados_fluxo=run_power_flow('NetData14Bus.xlsx','LoadData14Bus_V2.xlsx')
+rb=resultados_barras.copy()
+rl=resultados_linhas.copy()
+#Colocar Cabeçalho
+with open('teste.txt', 'w') as f:
+    f.write('======================Processo Iterativo================\n')
+    f.write('Numero de Iteracoes = %d \n' % (dados_fluxo['Iterações']))
+    f.write('Erro Maximo = %.3E \n' % (dados_fluxo['Erro máximo']))
+    f.write('Tolerancia = %.5f \n' % (dados_fluxo['Tolerancia']))
+    f.write('\n \n')
+    f.write('========================Dados Barra=====================\n')
+    for i in range(len(resultados_barras)):
+        f.write("%-2d % 3.5f % 3.5f % 2.5f % 2.5f % 2.5f % 2.5f \n" % (rb['Bus'][i],rb['V'][i],rb['Angle (deg)'][i],rb['Pinj (pu)'][i],rb['Qinj (pu)'][i],rb['Ireal (pu)'][i],rb['I_imag (pu)'][i]))
+    f.write('\n \n')
+    f.write('=======================================Dados Linha=========================================\n')
+    for i in range(len(resultados_linhas)):
+        f.write("%-2d %-2d %-2d % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f  \n" % (rl['Branch'][i],rl['From'][i],rl['To'][i],rl['Pij'][i],rl['Qij'][i],rl['Pji'][i],rl['Qji'][i],rl['Ire_ij'][i],rl['Iim_ij'][i],rl['Ire_ji'][i],rl['Iim_ji'][i]))
 
-    return flow_result
-
-df=run_power_flow('NetData14Bus.xlsx','LoadData14Bus.xlsx')
-print(df)
+f.close()
