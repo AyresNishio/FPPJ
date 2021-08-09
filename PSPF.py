@@ -1,3 +1,5 @@
+#Versão 1.0 09/08/2021
+
 import pandas as pd
 import numpy as np
 
@@ -51,7 +53,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
                 else:
                     J[i,j] = vmag[iloc]*vmag[j]*(G[iloc,j]*np.sin(vang[iloc]-vang[j])-B[iloc,j]*np.cos(vang[iloc]-vang[j])) # derivada dPi/dtetaj (fora diag - Hij) 
            
-#-----------------------------------------------------------------------------------------------------------------------------------------------------------------                       
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------                       
     for i in range(nP+1,neq): # derivadas da injecao de potencia reativa ## conferir neq ##
         iloc = int(zloc[i])
         for j in range(nbus):
