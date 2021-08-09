@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 
 def lerdados(dadoslinha, dadoscarga):
-    line = pd.read_excel(dadoslinha,index_col=0)
-    #line = dadoslinha
+    line = pd.read_excel(dadoslinha)
+    # line = dadoslinha
     line['Tap'] = line['Tap'].replace(0,1)
-    z = pd.read_excel(dadoscarga,index_col=0)
-    #z= dadoscarga
+    z = pd.read_excel(dadoscarga)
+    # z= dadoscarga
     #z = pd.read_excel(dadoscarga)
     nlin = len(line)
     nbus = len(z)
@@ -24,7 +24,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
         iloc = int(zloc[i])
         for j in range(nbus):
             j1 = j + nbus
-            if (z["Tipo"][j+1] == 0):
+            if (z["Tipo"][j] == 0):
                 if(j == iloc):
                     J[i,j] = 0
                     J[i,j1] = 0
@@ -40,7 +40,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
                     J[i,j] = vmag[iloc]*vmag[j]*(G[iloc,j]*np.sin(vang[iloc]-vang[j])-B[iloc,j]*np.cos(vang[iloc]-vang[j])); # derivada dPi/dtetaj (fora diag - Hij)
                     J[i,j1] = vmag[iloc]*(G[iloc,j]*np.cos(vang[iloc]-vang[j])+B[iloc,j]*np.sin(vang[iloc]-vang[j])); # derivada dPi/dVj (fora diag - Nij)
        
-            elif (z["Tipo"][j+1] == 1): # barra j eh PV - apenas tetaj eh variavel do problema
+            elif (z["Tipo"][j] == 1): # barra j eh PV - apenas tetaj eh variavel do problema
         
                 if (j == iloc):
                     J[i,j]=0
@@ -56,7 +56,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
         iloc = int(zloc[i])
         for j in range(nbus):
             j1 = j + nbus
-            if(z["Tipo"][j+1] == 0): # barra j eh PQ - tetaj e Vj sao variaveis do problema        
+            if(z["Tipo"][j] == 0): # barra j eh PQ - tetaj e Vj sao variaveis do problema        
                 if(j == iloc):
                     J[i,j]=0
                     J[i,j1]=0
@@ -70,7 +70,7 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
                     J[i,j] = vmag[iloc]*vmag[j]*(-G[iloc,j]*np.cos(vang[iloc]-vang[j])-B[iloc,j]*np.sin(vang[iloc]-vang[j])) # derivada dQi/dtetaj (fora diag - Mij)
                     J[i,j1] = vmag[iloc]*(G[iloc,j]*np.sin(vang[iloc]-vang[j])-B[iloc,j]*np.cos(vang[iloc]-vang[j])) # derivada dQi/dVj (fora diag - Lij)
                 
-            elif(z["Tipo"][j+1] == 1): # barra j eh PV - apenas tetaj eh variavel do problema        
+            elif(z["Tipo"][j] == 1): # barra j eh PV - apenas tetaj eh variavel do problema        
      
                 if (j == iloc):
                     J[i,j]=0
@@ -87,12 +87,12 @@ def jacob(vmag, vang, G, B, z, zloc, nbus, nP, nq, neq):
 
         if (j <= nbus - 1):
             j1 = j
-            if (z["Tipo"][j1 + 1] == 1):
+            if (z["Tipo"][j1] == 1):
                 ivar = ivar + 1
                 J1[:, ivar] = J[:, j]
         else:
             j1=j-nbus
-        if (z["Tipo"][j1 + 1] == 0):
+        if (z["Tipo"][j1] == 0):
             ivar = ivar + 1
             J1[:, ivar] = J[:, j]
 
@@ -120,7 +120,7 @@ def delta_z(vmag, vang, Z, G, B, nbus):
     # Calculo das injecoes de potencia e dos residuos deltaP e deltaQ
     for i in range(nbus):
 
-        if Z['Tipo'][i+1] == 0: # Barras PQ
+        if Z['Tipo'][i] == 0: # Barras PQ
             nP=nP+1
             nQ=nQ+1
 
@@ -129,7 +129,7 @@ def delta_z(vmag, vang, Z, G, B, nbus):
                 zestp[nP]=zestp[nP]+vmag[j]*(G[i,j]*np.cos(vang[i]-vang[j])+B[i,j]*np.sin(vang[i]-vang[j]))
             
             zestp[nP]=vmag[i]*zestp[nP]
-            resp[nP]=(Z['Pg'][i+1]-Z['Pl'][i+1])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
+            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP] # vetor contendo os residuos de potencia ativa (mismatches deltaP = Pesp - Pcal)
             zlocp[nP]=i
 
             # injecao de potencia reativa
@@ -138,10 +138,10 @@ def delta_z(vmag, vang, Z, G, B, nbus):
             
             zestq[nQ]=vmag[i]*zestq[nQ]
             #resq[nQ]=(-Z.at[i,'Ql'])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
-            resq[nQ]=(-Z['Ql'][i+1])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
+            resq[nQ]=(-Z['Ql'][i])-zestq[nQ] # vetor contendo os residuos de potencia reativa (mismatches deltaQ = Qesp - Qcal)
             zlocq[nQ]=i
         
-        elif Z['Tipo'][i+1] == 1: # Barras PV
+        elif Z['Tipo'][i] == 1: # Barras PV
             nP=nP+1
 
             # injecao de potencia ativa
@@ -150,7 +150,7 @@ def delta_z(vmag, vang, Z, G, B, nbus):
             
             zestp[nP]=vmag[i]*zestp[nP]
             #resp[nP]=(Z.at[i,'Pg']-Z.at[i,'Pl'])-zestp[nP]
-            resp[nP]=(Z['Pg'][i+1]-Z['Pl'][i+1])-zestp[nP]
+            resp[nP]=(Z['Pg'][i]-Z['Pl'][i])-zestp[nP]
             zlocp[nP]=i
 
     nEQ=(nP+1)+(nQ+1)
@@ -199,7 +199,10 @@ def flowres(vmag, vang, Ybus, G, B, Z, line, nbus, nlin):
         ys=pow(zs,-1)
         gs=ys.real
         bs=ys.imag
-        bsh=(1/row['C'])/2
+        if row['C'] > 0:
+            bsh=(1/row['C'])/2
+        else:
+            bsh=0
         FPA[i]=pow(vmag[From],2)*gs-vmag[From]*vmag[To]*(gs*np.cos(vang[From]-vang[To])+bs*np.sin(vang[From]-vang[To]))
         FPA1[i]=pow(vmag[To],2)*gs-vmag[From]*vmag[To]*(gs*np.cos(vang[To]-vang[From])+bs*np.sin(vang[To]-vang[From]))
         FPR[i]=-pow(vmag[From],2)*(bsh+bs)-vmag[From]*vmag[To]*(gs*np.sin(vang[From]-vang[To])-bs*np.cos(vang[From]-vang[To]))
@@ -232,7 +235,10 @@ def run_power_flow(dadoslinha, dadoscarga):
     for index, line in Lines.iterrows():
         zs=complex(line['R'],line['X']);
         y= 1/zs
-        bsh=complex(0,1/line['C'])/2;
+        if line['C'] > 0:
+            bsh=complex(0,1/line['C'])/2;
+        else:
+            bsh=0
         de = int(line['De'])-1
         para = int(line['Para'])-1
         tap = np.float64(line['Tap'])
@@ -245,7 +251,7 @@ def run_power_flow(dadoslinha, dadoscarga):
     B = Ybarra.imag
 
     for i in range(nbus):
-        B[i,i]=B[i,i] + Z['CS'][i+1] 
+        B[i,i]=B[i,i] + Z['CS'][i] 
 
     # Inicializacao do estado (flat start)
     # vmag = nbus*[1]
@@ -255,8 +261,8 @@ def run_power_flow(dadoslinha, dadoscarga):
     vang = np.zeros(nbus)
 
     for i in range(nbus):
-        if(Z['Tipo'][i+1] > 0):
-            vmag[i]=Z['V'][i+1]
+        if(Z['Tipo'][i] > 0):
+            vmag[i]=Z['V'][i]
         else:
             vmag[i]=1
 
@@ -294,10 +300,10 @@ def run_power_flow(dadoslinha, dadoscarga):
     # Lines, Z, nbus, nlin = lerdados(network_file,load_file)
     Vmag = vmag
     Vang = vang
-    tipo = ['V']*len(Vmag) + ['P']*len(FPA_dp) + ['P']*len(FPA_pd) + ['P']*len(IPA) + ['Q']*len(FPR_dp) + ['Q']*len(FPR_pd) + ['Q']*len(IPR)
-    De = list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1))
-    Para = ['-']*len(Vmag) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) 
-    Valor = Vmag.tolist() + FPA_dp.tolist() + FPA_pd.tolist() + FPR_dp.tolist() + FPR_pd.tolist() + IPA.tolist() + IPR.tolist()
+    tipo = ['V']*len(Vmag) + ['Ang']*len(Vang) + ['P']*len(FPA_dp) + ['P']*len(FPA_pd) + ['P']*len(IPA) + ['Q']*len(FPR_dp) + ['Q']*len(FPR_pd) + ['Q']*len(IPR)
+    De = list(range(1,nbus+1)) + list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1)) + list(Lines['De']) + list(Lines['Para']) + list(range(1,nbus+1))
+    Para = ['-']*len(Vmag) + ['-']*len(Vang) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) + list(Lines['Para']) + list(Lines['De']) + ['-']*len(Vmag) 
+    Valor = Vmag.tolist() + Vang.tolist() + FPA_dp.tolist() + FPA_pd.tolist() + FPR_dp.tolist() + FPR_pd.tolist() + IPA.tolist() + IPR.tolist()
 
 # Desvios baseados em:
                     # IEEE TRANS. INSTRUMENTATION AND MEASUREMENT
@@ -312,8 +318,8 @@ def run_power_flow(dadoslinha, dadoscarga):
             desvio_padrao.append(0.01)
         if i == 'Q': 
             desvio_padrao.append(0.01)
-        #if i == 'Ang':
-        #    desvio_padrao.append(0.018)
+        if i == 'Ang':
+            desvio_padrao.append(0.018)
 
     #Montagem do DataFrame        
     valores = {'Tipo':tipo,'De':De,'Para': Para,'Valor': Valor,'Desvio Padrão':desvio_padrao}
