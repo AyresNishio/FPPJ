@@ -1,4 +1,4 @@
-#Versão 1.0 09/08/2021
+#Versão 1.1 10/08/2021
 
 import pandas as pd
 import numpy as np
@@ -188,8 +188,9 @@ def flowres(vmag, vang, Ybus, G, B, Z, line, nbus, nlin):
     # Calculo das injecoes de corrente nas barras (forma retangular)
     for i in range(nbus):
         Vbus[i]=complex(vmag[i]*np.cos(vang[i]),vmag[i]*np.sin(vang[i]))
+    
 
-    Ibus=np.dot(Ybus,Vbus)
+    Ibus=Ybus@Vbus
 
 
     # Calculo dos fluxos de potencia ativa e reativa nos ramos
@@ -336,10 +337,14 @@ with open('teste.txt', 'w') as f:
     f.write('Tolerancia = %.5f \n' % (dados_fluxo['Tolerancia']))
     f.write('\n \n')
     f.write('========================Dados Barra=====================\n')
+    f.write("Bus V Angle(deg) Pinj(pu) Qinj(pu) Ireal(pu) Iimag(pu)")
+    f.write('\n')
     for i in range(len(resultados_barras)):
         f.write("%-2d % 3.5f % 3.5f % 2.5f % 2.5f % 2.5f % 2.5f \n" % (rb['Bus'][i],rb['V'][i],rb['Angle (deg)'][i],rb['Pinj (pu)'][i],rb['Qinj (pu)'][i],rb['Ireal (pu)'][i],rb['I_imag (pu)'][i]))
     f.write('\n \n')
     f.write('=======================================Dados Linha=========================================\n')
+    f.write("Branch From To Pij Qij Pji Qji Ire_ij Iim_ij Ire_ji Iim_ji")
+    f.write('\n')
     for i in range(len(resultados_linhas)):
         f.write("%-2d %-2d %-2d % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f  \n" % (rl['Branch'][i],rl['From'][i],rl['To'][i],rl['Pij'][i],rl['Qij'][i],rl['Pji'][i],rl['Qji'][i],rl['Ire_ij'][i],rl['Iim_ij'][i],rl['Ire_ji'][i],rl['Iim_ji'][i]))
 
