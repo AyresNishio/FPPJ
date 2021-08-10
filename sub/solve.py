@@ -66,7 +66,8 @@ def solver(Lines, Z, nbus, nlin):
         J = jacob(vmag, vang, G, B, Z, zloc, nbus, nP, nq, neq)
 
         # Atualizacao do estado 
-        deltax = np.dot(np.linalg.inv(J),res.transpose())
+        # deltax = np.dot(np.linalg.inv(J),res.transpose())
+        deltax = np.inv(J) * res[:, None]
 
         # Solucao do problema linear para determinar a modificacao a ser realizada no estado atual 
         for i in range(neq):
