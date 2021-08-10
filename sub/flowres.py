@@ -38,11 +38,11 @@ def flowres(vmag, vang, Ybus, G, B, Z, line, nbus, nlin):
         ys=pow(zs,-1)
         gs=ys.real
         bs=ys.imag
-        bsh=row['Bsh']/2
+        bsh=(1/row['C'])/2
         FPA[i]=pow(vmag[From],2)*gs-vmag[From]*vmag[To]*(gs*np.cos(vang[From]-vang[To])+bs*np.sin(vang[From]-vang[To]))
         FPA1[i]=pow(vmag[To],2)*gs-vmag[From]*vmag[To]*(gs*np.cos(vang[To]-vang[From])+bs*np.sin(vang[To]-vang[From]))
         FPR[i]=-pow(vmag[From],2)*(bsh+bs)-vmag[From]*vmag[To]*(gs*np.sin(vang[From]-vang[To])-bs*np.cos(vang[From]-vang[To]))
-        FPR1[i]=pow(vmag[To],2)*(bsh+bs)-vmag[From]*vmag[To]*(gs*np.sin(vang[To]-vang[From])-bs*np.cos(vang[To]-vang[From]))
+        FPR1[i]=-pow(vmag[To],2)*(bsh+bs)-vmag[From]*vmag[To]*(gs*np.sin(vang[To]-vang[From])-bs*np.cos(vang[To]-vang[From]))
         
         # Calculo dos fluxos de corrente nos ramos (forma retangular)
         FC[i]=ys*(Vbus[From]-Vbus[To])+complex(0,bsh)*Vbus[From]

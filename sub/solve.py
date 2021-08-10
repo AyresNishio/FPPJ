@@ -76,9 +76,9 @@ def solver(Lines, Z, nbus, nlin):
                 vang[izloc]=vang[izloc]+deltax[i] # atualizacao do angulo da tensao
             else:
                 vmag[izloc]=vmag[izloc]+deltax[i] # atualizacao da magnitude da tensao
-            iter=iter+1; #incrementa contador de iteracoes
+        iter=iter+1; #incrementa contador de iteracoes
 
-        vang*(180/3.1416)
-
-        # Calculo dos fluxos/injecoes de potencia e corrente para o estado convergido (subrotina flowres)
-        FPA, FPA1, FPR, FPR1, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, Lines, nbus, nlin)
+    vang*(180/np.pi)
+    # Calculo dos fluxos/injecoes de potencia e corrente para o estado convergido (subrotina flowres)
+    FPA_dp, FPA_pd, FPR_dp, FPR_pd, IPA, IPR, Ibarra, FC, FC1=flowres(vmag, vang, Ybarra, G, B, Z, Lines, nbus, nlin)
+    return vmag,vang,FPA_dp, FPA_pd, FPR_dp, FPR_pd, IPA, IPR, Ibarra, FC, FC1
