@@ -336,16 +336,32 @@ with open('teste.txt', 'w') as f:
     f.write('Erro Maximo = %.3E \n' % (dados_fluxo['Erro máximo']))
     f.write('Tolerancia = %.5f \n' % (dados_fluxo['Tolerancia']))
     f.write('\n \n')
-    f.write('========================Dados Barra=====================\n')
-    f.write("Bus V Angle(deg) Pinj(pu) Qinj(pu) Ireal(pu) Iimag(pu)")
+    f.write('================================ BUS DATA ====================================\n')
+    f.write(("{:>3}").format("Bus") + "\t\t" +
+            ("{:>9}").format("V(pu)") + "\t\t" +
+            ("{:>9}").format("Angle(deg)") + "\t" +
+            ("{:>9}").format("Pinj(pu)") + "\t\t" +
+            ("{:>9}").format("Qinj(pu)") + "\t\t" +
+            ("{:>9}").format("Ireal(pu)") + "\t\t" +
+            ("{:>9}").format("Iimag(pu)"))
     f.write('\n')
     for i in range(len(resultados_barras)):
-        f.write("%-2d % 3.5f % 3.5f % 2.5f % 2.5f % 2.5f % 2.5f \n" % (rb['Bus'][i],rb['V'][i],rb['Angle (deg)'][i],rb['Pinj (pu)'][i],rb['Qinj (pu)'][i],rb['Ireal (pu)'][i],rb['I_imag (pu)'][i]))
+        f.write("%3d \t % 3.5f \t % 3.5f \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f \n" % (rb['Bus'][i],rb['V'][i],rb['Angle (deg)'][i],rb['Pinj (pu)'][i],rb['Qinj (pu)'][i],rb['Ireal (pu)'][i],rb['I_imag (pu)'][i]))
     f.write('\n \n')
-    f.write('=======================================Dados Linha=========================================\n')
-    f.write("Branch From To Pij Qij Pji Qji Ire_ij Iim_ij Ire_ji Iim_ji")
+    f.write('================================================= BRANCH DATA ======================================================\n')
+    f.write(("{:>6}").format("Branch") + "\t" +
+            ("{:>5}").format("From") + "\t" +
+            ("{:>3}").format("To") + "\t\t" +
+            ("{:>9}").format("Pij") + "\t\t" +
+            ("{:>9}").format("Qij") + "\t\t" +
+            ("{:>9}").format("Pji") + "\t\t" +
+            ("{:>9}").format("Qji") + "\t\t" +
+            ("{:>9}").format("Ire_ij") + "\t\t" +
+            ("{:>9}").format("Iim_ij") + "\t\t" +
+            ("{:>9}").format("Ire_ji") + "\t\t" +
+            ("{:>9}").format("Iim_ji"))
+    
     f.write('\n')
     for i in range(len(resultados_linhas)):
-        f.write("%-2d %-2d %-2d % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f % 2.5f  \n" % (rl['Branch'][i],rl['From'][i],rl['To'][i],rl['Pij'][i],rl['Qij'][i],rl['Pji'][i],rl['Qji'][i],rl['Ire_ij'][i],rl['Iim_ij'][i],rl['Ire_ji'][i],rl['Iim_ji'][i]))
-
+        f.write("%6d \t %4d\t %2d \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f \t % 2.5f  \n" % (rl['Branch'][i],rl['From'][i],rl['To'][i],rl['Pij'][i],rl['Qij'][i],rl['Pji'][i],rl['Qji'][i],rl['Ire_ij'][i],rl['Iim_ij'][i],rl['Ire_ji'][i],rl['Iim_ji'][i]))
 f.close()
